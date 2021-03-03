@@ -29,10 +29,7 @@ def Z_score(feature):  # 对特征向量进行Z-score标准化
         sigma[a] = (sigma[a] / len(feature)) ** 0.5
     for a in range(len(feature)):
         for b in range(len(feature[0])):
-            if sigma[b] == 0:
-                feature[a][b] = 0
-            else:
-                feature[a][b] = (feature[a][b] - mean[b]) / sigma[b]
+            feature[a][b] = 0 if sigma[b] == 0 else (feature[a][b] - mean[b]) / sigma[b]
     return feature
 
 
@@ -49,9 +46,7 @@ def function_1(rumor_file):  #
     # 对特征向量进行Z-score标准化
     l = Z_score(l)
     for j in range(1, len(l)):
-        slope = []
-        for n in range(len(l[0])):
-            slope.append((l[j][n] - l[j - 1][n]) / interval)
+        slope = [(l[j][n] - l[j - 1][n]) / interval for n in range(len(l[0]))]
         slopes.append(slope)
     l = l + slopes  # 在特征向量后面添加斜率
     with open('feature1_10/' + rumor_file + '.txt', 'w')as f1:
@@ -75,9 +70,7 @@ def function_2(non_file):
     # 对特征向量进行Z-score标准化
     l = Z_score(l)
     for j in range(1, len(l)):
-        slope = []
-        for n in range(len(l[0])):
-            slope.append((l[j][n] - l[j - 1][n]) / interval)
+        slope = [(l[j][n] - l[j - 1][n]) / interval for n in range(len(l[0]))]
         slopes.append(slope)
     l = l + slopes  # 在特征向量后面添加斜率
     with open('feature2_10/' + non_file + '.txt', 'w')as f2:
