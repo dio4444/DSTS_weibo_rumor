@@ -104,9 +104,9 @@ if __name__ == '__main__':
         clf.fit(X_train, y_train)
         result = clf.predict(X_test)
         accuracy += sklearn.metrics.accuracy_score(y_test, result)
-        precision += sklearn.metrics.precision_score(y_test, result, average='weighted')
+        precision += sklearn.metrics.precision_score(y_test, result, average=None)
         # average='weighted' 为每个标签计算指标，并通过各类占比找到它们的加权均值（每个标签的正例数）
-        recall += sklearn.metrics.recall_score(y_test, result, average='weighted')
+        recall += sklearn.metrics.recall_score(y_test, result, average=None, zero_division=1)
         print('完成', (i + 1) * 20, '%')
 
     accuracy = accuracy / 5
