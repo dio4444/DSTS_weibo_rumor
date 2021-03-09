@@ -1,16 +1,18 @@
 import json
 import os
+import re
+
 import jieba_fast as jieba
 import gensim
 from gensim import corpora
 
 
 if __name__ == '__main__':
-    jieba.load_userdict("F:/代码code/DSTS/dict/dict_baidu_utf8.txt")
-    jieba.load_userdict("F:/代码code/DSTS/dict/dict_pangu.txt")
-    jieba.load_userdict("F:/代码code/DSTS/dict/dict_sougou_utf8.txt")
-    jieba.load_userdict("F:/代码code/DSTS/dict/dict_tencent_utf8.txt")
-    jieba.load_userdict("F:/代码code/DSTS/dict/my_dict.txt")
+    jieba.load_userdict("../dict/dict_baidu_utf8.txt")
+    jieba.load_userdict("../dict/dict_pangu.txt")
+    jieba.load_userdict("../dict/dict_sougou_utf8.txt")
+    jieba.load_userdict("../dict/dict_tencent_utf8.txt")
+    jieba.load_userdict("../dict/my_dict.txt")
     stopwords = []  # 创建停用词列表
     for line in open('../dict/Stopword.txt', encoding='UTF-8'):
         x = line.split('\n')[0]
@@ -30,12 +32,15 @@ if __name__ == '__main__':
             for i in range(0, len(weibo_dict)):
                 item = weibo_dict[i]
                 text = item['text']  # 逐条提取微博正文
+                username = re.findall('@(.*?) ', text)  # 用正则表达式提取@用户名
+                for item in username:  # 将用户名删除
+                    text = (text.replace(item, ''))
                 seg_list = jieba.lcut(text, cut_all=False)  # 使用分词，将文本分开 生成列表
                 result = []
                 for j in seg_list:  # 去掉停用词
                     if j not in stopwords and j is not ' ':
                         result.append(j)
-                if len(result) >= 5:
+                if len(result) >= 10:
                     doc_complete.append(result)  # 把一条微博的正文分词结果添加进文档列表内
     print('谣言数据集加载完毕，开始加载非谣言数据集：')
     for doc in non:
@@ -47,12 +52,15 @@ if __name__ == '__main__':
             for i in range(0, len(weibo_dict)):
                 item = weibo_dict[i]
                 text = item['text']  # 逐条提取微博正文
+                username = re.findall('@(.*?) ', text)  # 用正则表达式提取@用户名
+                for item in username:  # 将用户名删除
+                    text = (text.replace(item, ''))
                 seg_list = jieba.lcut(text, cut_all=False)  # 使用分词，将文本分开 生成列表
                 result = []
                 for j in seg_list:  # 去掉停用词
                     if j not in stopwords and j is not ' ':
                         result.append(j)
-                if len(result) >= 5:
+                if len(result) >= 10:
                     doc_complete.append(result)  # 把一条微博的正文分词结果添加进文档列表内
     print('非谣言数据加载完毕')
     print('共计', len(doc_complete), '条文本')
