@@ -52,7 +52,7 @@ def text_analysis(filename):
                 stamp = (N-1)  # 得到时间戳
             # #########################微博的内容特征
             text = item['text']  # 文本
-            topic = LDA_topic(text)
+
             length = len(text)  # 文本长度
             hashtags_list = re.findall("#(.*)#", text)  # 提取标签，返回列表
             hashtags = len(hashtags_list)  # 返回标签数
@@ -66,6 +66,9 @@ def text_analysis(filename):
                     pos_emot_count += 1
             url = text.count('http://')  # 统计出现网址个数
             at_mention = text.count('@')  # 统计 @ 行为
+            username = re.findall('@(.*?) ', text)  # 用正则表达式提取@用户名
+            for item in username:  # 将用户名删除
+                text = (text.replace(item, ''))
             exclamation_marks = text.count('!') + text.count('！')  # !数量
             question_marks = text.count('?') + text.count('？')  # ?数量
             if exclamation_marks == 0:
@@ -77,11 +80,11 @@ def text_analysis(filename):
             neg_word_count = 0  # 负面词数量
             first_person_pronouns = 0  # 第一人称代词数，因为第一人称代词基本上是停用词，故应该在文本内查找
             for word in seg_list:
-                if (word is '我' or word is '我们' or word is '俺' or word is '咱'
-                        or word is '小生' or word is '吾' or word is '吾辈' or word
-                        is '在下' or word is '老夫' or word is '余' or word is '鄙人'
-                        or word is 'I' or word is 'me' or word is 'we' or word is
-                        'us' or word is 'We'):
+                if (word == '我' or word == '我们' or word == '俺' or word == '咱'
+                        or word == '小生' or word == '吾' or word == '吾辈' or word
+                        == '在下' or word == '老夫' or word == '余' or word == '鄙人'
+                        or word == 'I' or word == 'me' or word == 'we' or word ==
+                        'us' or word == 'We'):
                     first_person_pronouns += 1
             result = []
             for k in seg_list:  # 去掉停用词
@@ -93,6 +96,7 @@ def text_analysis(filename):
                 elif word in pos_dict:
                     pos_word_count += 1
             sentiment_score = pos_emot_count + pos_word_count - neg_emot_count - neg_word_count  # 情绪得分
+            topic = LDA_topic(result)
             vector = [stamp, interval, length, sentiment_score, url, pos_emot_count,
                       neg_emot_count, first_person_pronouns,hashtags, at_mention,
                       question_marks, exclamation_marks, question_exclamation] + topic
@@ -143,7 +147,5 @@ def text_analysis(filename):
 
 
 if __name__ == '__main__':
-    z = (text_analysis('rumor/11084174628.json'))
-    for i in range(len(z)):
-        print(z[i])
-    print(len(z))
+    z = (text_analysis('rumor/4016873519.json'))
+
