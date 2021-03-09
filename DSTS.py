@@ -29,32 +29,27 @@ def Z_score(feature):  # 对特征向量进行Z-score标准化
         sigma[a] = (sigma[a] / len(feature)) ** 0.5
     for a in range(len(feature)):
         for b in range(len(feature[0])):
-            if sigma[b] == 0:
-                feature[a][b] = 0
-            else:
-                feature[a][b] = (feature[a][b] - mean[b]) / sigma[b]
+            feature[a][b] = 0 if sigma[b] == 0 else (feature[a][b] - mean[b]) / sigma[b]
     return feature
 
 
 def function_1(rumor_file):  #
-    t = text_analysis('rumor/' + rumor_file)
-    u = user_analysis('rumor/' + rumor_file)
-    p = propagation_analysis('rumor/' + rumor_file)
+    t = text_analysis('./rumor/' + rumor_file)
+    u = user_analysis('./rumor/' + rumor_file)
+    p = propagation_analysis('./rumor/' + rumor_file)
     l = []  # 记录特征向量
     slopes = []  # 记录斜率
     interval = t[0][1] / 3600  # 以小时为单位的区间间隔
     for i in range(len(t)):
-        temp = t[i][2:] + u[i] + p[i]  # 将三种类型的向量合并到一个向量中
+        temp = t[i][2:] + u[i][1:] + p[i][1:]  # 将三种类型的向量合并到一个向量中
         l.append(temp)
     # 对特征向量进行Z-score标准化
     l = Z_score(l)
     for j in range(1, len(l)):
-        slope = []
-        for n in range(len(l[0])):
-            slope.append((l[j][n] - l[j - 1][n]) / interval)
+        slope = [(l[j][n] - l[j - 1][n]) / interval for n in range(len(l[0]))]
         slopes.append(slope)
     l = l + slopes  # 在特征向量后面添加斜率
-    with open('feature1_10/' + rumor_file + '.txt', 'w')as f1:
+    with open('./feature1_10/' + rumor_file + '.txt', 'w')as f1:
         for item in l:
             for thing in item:
                 f1.write(str(thing))
@@ -63,24 +58,22 @@ def function_1(rumor_file):  #
 
 
 def function_2(non_file):
-    t = text_analysis('non_rumor/' + non_file)
-    u = user_analysis('non_rumor/' + non_file)
-    p = propagation_analysis('non_rumor/' + non_file)
+    t = text_analysis('./non_rumor/' + non_file)
+    u = user_analysis('./non_rumor/' + non_file)
+    p = propagation_analysis('./non_rumor/' + non_file)
     l = []  # 记录特征向量
     slopes = []  # 记录斜率
     interval = t[0][1] / 3600  # 以小时为单位的区间间隔
     for i in range(len(t)):
-        temp = t[i][2:] + u[i] + p[i]  # 将三种类型的向量合并到一个向量中
+        temp = t[i][2:] + u[i][1:] + p[i][1:]  # 将三种类型的向量合并到一个向量中
         l.append(temp)
     # 对特征向量进行Z-score标准化
     l = Z_score(l)
     for j in range(1, len(l)):
-        slope = []
-        for n in range(len(l[0])):
-            slope.append((l[j][n] - l[j - 1][n]) / interval)
+        slope = [(l[j][n] - l[j - 1][n]) / interval for n in range(len(l[0]))]
         slopes.append(slope)
     l = l + slopes  # 在特征向量后面添加斜率
-    with open('feature2_10/' + non_file + '.txt', 'w')as f2:
+    with open('./feature2_10/' + non_file + '.txt', 'w')as f2:
         for item in l:
             for thing in item:
                 f2.write(str(thing))
@@ -89,8 +82,8 @@ def function_2(non_file):
 
 
 if __name__ == '__main__':
-    rumor = os.listdir('rumor')
-    non = os.listdir('non_rumor')
+    rumor = os.listdir('./rumor')
+    non = os.listdir('./non_rumor')
     with concurrent.futures.ProcessPoolExecutor() as executor:  # 并行化处理
         executor.map(function_1, rumor)
     with concurrent.futures.ProcessPoolExecutor() as executor:
